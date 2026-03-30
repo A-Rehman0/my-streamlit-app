@@ -4,6 +4,7 @@ import pickle
 from datetime import datetime
 
 st.title("Blue Planet Info Solution")
+st.write("Team Leader")
 st.code("Tade A Rehman")
 
 # Load Pickle file
@@ -73,3 +74,12 @@ if not filtered_df.empty:
 else:
     st.write("No matching records found.")
 st.write("Note : After Colmpleting Task Report to TL.")
+
+st.markdown(
+    """
+    <a href="https://docs.google.com/spreadsheets/d/1Y08jTldMTCyUvWUpgNbMb-9WJNbbD-D3/edit?gid=256704825#gid=256704825" target="_blank">
+        <button>Data Collection Task File</button>
+    </a>
+    """,
+    unsafe_allow_html=True
+)
