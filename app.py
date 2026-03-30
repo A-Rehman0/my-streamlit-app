@@ -2,8 +2,9 @@ import streamlit as st
 import pandas as pd
 import pickle
 from datetime import datetime
+import pytz  # For timezone handling
 
-# Page config (WIDE)
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Blue Planet", layout="wide")
 
 # Hide Streamlit UI elements
@@ -36,36 +37,36 @@ h2 { color: #0a58ca; }
 </style>
 """, unsafe_allow_html=True)
 
-# Title
+# ---------------- TITLE ----------------
 st.markdown("## Blue Planet Infosolutions Pvt. Ltd., India")
 st.caption("Team Leader: Tade A Rehman")
 
-# Load data
+# ---------------- LOAD DATA ----------------
 try:
     df = pickle.load(open("data.pkl", "rb"))
 except:
     st.error("Error loading file")
     st.stop()
 
-# Basic checks
+# Check required columns
 if 'Date' not in df.columns or 'Intern Name' not in df.columns:
     st.error("Required columns missing")
     st.stop()
 
-# Date cleaning
+# ---------------- CLEAN DATA ----------------
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 df = df.dropna(subset=['Date'])
 
 # Remove future dates
-today = pd.Timestamp(datetime.today().date())
-df = df[df['Date'] <= today]
+india_tz = pytz.timezone("Asia/Kolkata")
+today = datetime.now(india_tz).date()
+df = df[df['Date'].dt.date <= today]
 
 # Sort data
 df = df.sort_values("Date")
 
 # ---------------- UI SECTION ----------------
 st.markdown("### 🔍 Filter Tasks")
-
 col1, col2 = st.columns(2)
 
 with col1:
@@ -74,22 +75,20 @@ with col1:
 intern_df = df[df['Intern Name'] == intern]
 dates = intern_df['Date']
 
-# 👉 Smart default date logic
-default_date = today.date()
-
+# ---------------- SMART DEFAULT DATE ----------------
+default_date = today
 if not dates.empty:
     available_dates = dates.dt.date.unique()
-    if default_date not in available_dates:
+    if today not in available_dates:
         default_date = dates.max().date()
 
-# ✅ FIX: Proper session state handling
-if "selected_date" not in st.session_state:
+# ---------------- SESSION STATE LOGIC ----------------
+if "init_done" not in st.session_state:
     st.session_state.selected_date = default_date
-
-# If intern changes → reset date properly
-if "last_intern" not in st.session_state:
     st.session_state.last_intern = intern
+    st.session_state.init_done = True
 
+# Reset date if intern changes
 if st.session_state.last_intern != intern:
     st.session_state.selected_date = default_date
     st.session_state.last_intern = intern
@@ -97,29 +96,31 @@ if st.session_state.last_intern != intern:
 with col2:
     selected_date = st.date_input(
         "📅 Select Date",
-        key="selected_date"
+        value=st.session_state.selected_date,
+        key="date_widget"
     )
+
+# Sync back to session
+st.session_state.selected_date = selected_date
 
 # ---------------- RESULT ----------------
 st.markdown("---")
 st.markdown("### 📌 Task Details")
 
-result = intern_df[intern_df['Date'] == pd.Timestamp(selected_date)]
+result = intern_df[intern_df['Date'].dt.date == selected_date]
 
 if not result.empty:
     st.dataframe(result, use_container_width=True)
 else:
-    if selected_date == today.date():
+    if selected_date == today:
         st.info("No tasks uploaded for today yet")
     else:
         st.warning("No task found for selected date")
 
 # ---------------- FOOTER ----------------
 st.markdown("---")
-
 st.link_button(
     "📊 Open Data Collection File",
     "https://docs.google.com/spreadsheets/d/1Y08jTldMTCyUvWUpgNbMb-9WJNbbD-D3/edit?gid=256704825#gid=256704825"
 )
-
 st.caption("After completing task, report to Team Leader.")
