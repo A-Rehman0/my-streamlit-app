@@ -12,14 +12,18 @@ hide_streamlit_style = """
     /* Hide top-right menu */
     #MainMenu {visibility: hidden;}
     
-    /* Hide header */
+    /* Hide header (logo) */
     header {visibility: hidden;}
     
-    /* Hide footer */
+    /* Hide footer (Made with Streamlit / Hosted with Streamlit) */
     footer {visibility: hidden;}
     
-    /* Hide code inspector / "view code" button */
+    /* Hide "View code" button */
     [title="View code"] {visibility: hidden !important;}
+    
+    /* Optional: remove padding/margins for full-page look */
+    .css-1d391kg {padding-top: 0rem;}  /* main container */
+    .block-container {padding: 1rem 1rem;} /* content padding */
     </style>
 """
 
