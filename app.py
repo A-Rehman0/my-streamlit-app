@@ -78,12 +78,27 @@ dates = intern_df['Date']
 default_date = today.date()
 
 if not dates.empty:
-    available_dates = dates.dt.date.values
+    available_dates = dates.dt.date.unique()
     if default_date not in available_dates:
         default_date = dates.max().date()
 
+# ✅ FIX: Proper session state handling
+if "selected_date" not in st.session_state:
+    st.session_state.selected_date = default_date
+
+# If intern changes → reset date properly
+if "last_intern" not in st.session_state:
+    st.session_state.last_intern = intern
+
+if st.session_state.last_intern != intern:
+    st.session_state.selected_date = default_date
+    st.session_state.last_intern = intern
+
 with col2:
-    selected_date = st.date_input("📅 Select Date", value=default_date)
+    selected_date = st.date_input(
+        "📅 Select Date",
+        key="selected_date"
+    )
 
 # ---------------- RESULT ----------------
 st.markdown("---")
