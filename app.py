@@ -6,50 +6,34 @@ from datetime import datetime
 # Page config (WIDE)
 st.set_page_config(page_title="Blue Planet", layout="wide")
 
-
+# Hide Streamlit UI elements
 hide_streamlit_style = """
-      <style>
-    /* Hide top-right menu */
-    #MainMenu {visibility: hidden;}
-    
-    /* Hide header (logo) */
-    header {visibility: hidden;}
-    
-    /* Hide footer (Made with Streamlit / Hosted with Streamlit) */
-    footer {visibility: hidden;}
-    
-    /* Hide "View code" button */
-    [title="View code"] {visibility: hidden !important;}
-    
-    /* Optional: remove padding/margins for full-page look */
-    .css-1d391kg {padding-top: 0rem;}  /* main container */
-    .block-container {padding: 1rem 1rem;} /* content padding */
-    </style>
+<style>
+#MainMenu {visibility: hidden;}
+header {visibility: hidden;}
+footer {visibility: hidden;}
+[title="View code"] {visibility: hidden !important;}
+.block-container {padding: 1rem 1rem;}
+</style>
 """
-
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-# Custom CSS for colors
+
+# Custom CSS
 st.markdown("""
-    <style>
-    body {
-        background-color: #f4f9ff;
-    }
-    .main {
-        background-color: #f4f9ff;
-    }
-    h2 {
-        color: #0a58ca;
-    }
-    .stButton>button {
-        background-color: #0a58ca;
-        color: white;
-        border-radius: 8px;
-    }
-    .stDataFrame {
-        border: 2px solid #0a58ca;
-        border-radius: 10px;
-    }
-    </style>
+<style>
+body { background-color: #f4f9ff; }
+.main { background-color: #f4f9ff; }
+h2 { color: #0a58ca; }
+.stButton>button {
+    background-color: #0a58ca;
+    color: white;
+    border-radius: 8px;
+}
+.stDataFrame {
+    border: 2px solid #0a58ca;
+    border-radius: 10px;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # Title
@@ -76,7 +60,7 @@ df = df.dropna(subset=['Date'])
 today = pd.Timestamp(datetime.today().date())
 df = df[df['Date'] <= today]
 
-# Sort
+# Sort data
 df = df.sort_values("Date")
 
 # ---------------- UI SECTION ----------------
@@ -90,11 +74,16 @@ with col1:
 intern_df = df[df['Intern Name'] == intern]
 dates = intern_df['Date']
 
+# 👉 Smart default date logic
+default_date = today.date()
+
+if not dates.empty:
+    available_dates = dates.dt.date.values
+    if default_date not in available_dates:
+        default_date = dates.max().date()
+
 with col2:
-    selected_date = st.date_input(
-        "📅 Select Date",
-        value=dates.max().date() if not dates.empty else today.date()
-    )
+    selected_date = st.date_input("📅 Select Date", value=default_date)
 
 # ---------------- RESULT ----------------
 st.markdown("---")
@@ -105,7 +94,10 @@ result = intern_df[intern_df['Date'] == pd.Timestamp(selected_date)]
 if not result.empty:
     st.dataframe(result, use_container_width=True)
 else:
-    st.warning("No task found for selected date")
+    if selected_date == today.date():
+        st.info("No tasks uploaded for today yet")
+    else:
+        st.warning("No task found for selected date")
 
 # ---------------- FOOTER ----------------
 st.markdown("---")
