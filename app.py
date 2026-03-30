@@ -3,7 +3,8 @@ import pandas as pd
 import pickle
 from datetime import datetime
 
-st.title("Intern Schedule Lookup")
+st.title("Blue Planet Info Solution")
+st.code("Tade A Rehman")
 
 # Load Pickle file
 file_path = "data.pkl"  # replace with your actual path
@@ -66,8 +67,9 @@ filtered_df = df[
     (df['Date'] == pd.Timestamp(selected_date))
 ]
 
-st.subheader("Matching Row(s):")
+st.subheader("Your Task:")
 if not filtered_df.empty:
-    st.table(filtered_df)
+    st.data_editor(filtered_df)
 else:
     st.write("No matching records found.")
+st.write("Note : After Colmpleting Task Report to TL.")
