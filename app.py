@@ -8,10 +8,18 @@ st.set_page_config(page_title="Blue Planet", layout="wide")
 
 
 hide_streamlit_style = """
-    <style>
+      <style>
+    /* Hide top-right menu */
     #MainMenu {visibility: hidden;}
+    
+    /* Hide header */
     header {visibility: hidden;}
+    
+    /* Hide footer */
     footer {visibility: hidden;}
+    
+    /* Hide code inspector / "view code" button */
+    [title="View code"] {visibility: hidden !important;}
     </style>
 """
 
