@@ -6,6 +6,16 @@ from datetime import datetime
 # Page config (WIDE)
 st.set_page_config(page_title="Blue Planet", layout="wide")
 
+
+hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    </style>
+"""
+
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 # Custom CSS for colors
 st.markdown("""
     <style>
