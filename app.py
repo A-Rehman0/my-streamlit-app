@@ -3,83 +3,94 @@ import pandas as pd
 import pickle
 from datetime import datetime
 
-st.title("Blue Planet Info Solution")
-st.write("Team Leader")
-st.code("Tade A Rehman")
+# Page config (WIDE)
+st.set_page_config(page_title="Blue Planet", layout="wide")
 
-# Load Pickle file
-file_path = "data.pkl"  # replace with your actual path
+# Custom CSS for colors
+st.markdown("""
+    <style>
+    body {
+        background-color: #f4f9ff;
+    }
+    .main {
+        background-color: #f4f9ff;
+    }
+    h2 {
+        color: #0a58ca;
+    }
+    .stButton>button {
+        background-color: #0a58ca;
+        color: white;
+        border-radius: 8px;
+    }
+    .stDataFrame {
+        border: 2px solid #0a58ca;
+        border-radius: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Title
+st.markdown("## Blue Planet Infosolutions Pvt. Ltd., India")
+st.caption("Team Leader: Tade A Rehman")
+
+# Load data
 try:
-    with open(file_path, 'rb') as f:
-        obj = pickle.load(f)
-except FileNotFoundError:
-    st.error("Pickle file not found. Please check the path.")
-    st.stop()
-except Exception as e:
-    st.error(f"Error loading Pickle file: {e}")
+    df = pickle.load(open("data.pkl", "rb"))
+except:
+    st.error("Error loading file")
     st.stop()
 
-# Ensure the loaded object is a DataFrame
-if isinstance(obj, pd.DataFrame):
-    df = obj
-else:
-    st.error("Loaded object is not a pandas DataFrame.")
+# Basic checks
+if 'Date' not in df.columns or 'Intern Name' not in df.columns:
+    st.error("Required columns missing")
     st.stop()
 
-# Ensure 'Date' column exists and convert to datetime
-if 'Date' in df.columns:
-    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-    df = df.dropna(subset=['Date'])  # Drop rows with invalid dates
-else:
-    st.error("No 'Date' column found in the DataFrame.")
-    st.stop()
+# Date cleaning
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+df = df.dropna(subset=['Date'])
 
-# Ensure 'Intern Name' column exists
-if 'Intern Name' not in df.columns:
-    st.error("No 'Intern Name' column found in the DataFrame.")
-    st.stop()
-
-# Filter out future dates
+# Remove future dates
 today = pd.Timestamp(datetime.today().date())
 df = df[df['Date'] <= today]
 
-# Dropdown for Intern Name
-selected_intern = st.selectbox("Select Intern Name", df['Intern Name'].unique())
+# Sort
+df = df.sort_values("Date")
 
-# Calendar for Date (only past & today)
-# Get available dates for selected intern
-available_dates = df[df['Intern Name'] == selected_intern]['Date']
-if not available_dates.empty:
-    # Default date is the latest available date
-    default_date = available_dates.max().date()
+# ---------------- UI SECTION ----------------
+st.markdown("### 🔍 Filter Tasks")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    intern = st.selectbox("👤 Select Intern", df['Intern Name'].unique())
+
+intern_df = df[df['Intern Name'] == intern]
+dates = intern_df['Date']
+
+with col2:
+    selected_date = st.date_input(
+        "📅 Select Date",
+        value=dates.max().date() if not dates.empty else today.date()
+    )
+
+# ---------------- RESULT ----------------
+st.markdown("---")
+st.markdown("### 📌 Task Details")
+
+result = intern_df[intern_df['Date'] == pd.Timestamp(selected_date)]
+
+if not result.empty:
+    st.dataframe(result, use_container_width=True)
 else:
-    default_date = today.date()
+    st.warning("No task found for selected date")
 
-selected_date = st.date_input(
-    "Select Date",
-    value=default_date,
-    min_value=min(available_dates).date() if not available_dates.empty else None,
-    max_value=today.date()
+# ---------------- FOOTER ----------------
+st.markdown("---")
+
+st.link_button(
+    "📊 Open Data Collection File",
+    "https://docs.google.com/spreadsheets/d/1Y08jTldMTCyUvWUpgNbMb-9WJNbbD-D3/edit?gid=256704825#gid=256704825"
 )
 
-# Filter DataFrame
-filtered_df = df[
-    (df['Intern Name'] == selected_intern) &
-    (df['Date'] == pd.Timestamp(selected_date))
-]
-
-st.subheader("Your Task:")
-if not filtered_df.empty:
-    st.data_editor(filtered_df)
-else:
-    st.write("No matching records found.")
-st.write("Note : After Colmpleting Task Report to TL.")
-
-st.markdown(
-    """
-    <a href="https://docs.google.com/spreadsheets/d/1Y08jTldMTCyUvWUpgNbMb-9WJNbbD-D3/edit?gid=256704825#gid=256704825" target="_blank">
-        <button>Data Collection Task File</button>
-    </a>
-    """,
-    unsafe_allow_html=True
-)
+st.caption("After completing task, report to Team Leader.")
