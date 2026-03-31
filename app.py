@@ -119,7 +119,7 @@ else:
 
 # ---------------- FOOTER ----------------
 st.markdown("---")
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns([1, 1, 3])  # last column is just empty space
 
 with col1:
     st.link_button(
@@ -132,5 +132,6 @@ with col2:
         "📝 Mark Attendance",
         "YOUR_GOOGLE_FORM_LINK_HERE"
     )
+
 
 st.caption("After completing task, report to Team Leader.")
