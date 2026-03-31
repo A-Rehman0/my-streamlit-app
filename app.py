@@ -135,6 +135,13 @@ with col2:
 
 col1, col2, col3= st.columns(3)
 with col1:
-    st.caption("📝 After completing task, report to Team Leader.")
+    st.markdown(
+    "<p style='color:#0a58ca; font-weight:500;'>📝 After completing task, report to Team Leader.</p>",
+    unsafe_allow_html=True
+)
 with col2:
-    st.caption("📝 share your task updates in the Blue Planet Communication group for HR attendance tracking.")
+    st.markdown(
+    "<p style='color:#0a58ca; font-weight:500;'>📝 share your task updates in the Blue Planet Communication group for HR attendance tracking.</p>",
+    unsafe_allow_html=True
+)
+   
