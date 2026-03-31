@@ -130,7 +130,7 @@ with col1:
 with col2:
     st.link_button(
         "📝 Mark Attendance",
-        "YOUR_GOOGLE_FORM_LINK_HERE"
+        "https://docs.google.com/forms/d/e/1FAIpQLScHz7fdRGl0RbMTyh_8N5VH9G0K1LDsszsZRqwHMe9CsXcqlA/viewform"
     )
 
 
