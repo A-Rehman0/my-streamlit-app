@@ -133,5 +133,8 @@ with col2:
         "https://docs.google.com/forms/d/e/1FAIpQLScHz7fdRGl0RbMTyh_8N5VH9G0K1LDsszsZRqwHMe9CsXcqlA/viewform"
     )
 
-
-st.caption("After completing task, report to Team Leader.")
+col1, col2= st.columns(2)
+with col1:
+    st.caption("After completing task, report to Team Leader.")
+with col2:
+    st.caption("share your task updates in the Blue Planet Communication group for HR attendance tracking.")
