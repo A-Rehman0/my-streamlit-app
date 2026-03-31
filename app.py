@@ -133,7 +133,7 @@ with col2:
         "https://docs.google.com/forms/d/e/1FAIpQLScHz7fdRGl0RbMTyh_8N5VH9G0K1LDsszsZRqwHMe9CsXcqlA/viewform"
     )
 
-col1, col2 col3= st.columns(3)
+col1, col2, col3= st.columns(3)
 with col1:
     st.caption("After completing task, report to Team Leader.")
 with col2:
