@@ -119,8 +119,18 @@ else:
 
 # ---------------- FOOTER ----------------
 st.markdown("---")
-st.link_button(
-    "📊 Open Data Collection File",
-    "https://docs.google.com/spreadsheets/d/1Y08jTldMTCyUvWUpgNbMb-9WJNbbD-D3/edit?gid=256704825#gid=256704825"
-)
+col1, col2 = st.columns(2)
+
+with col1:
+    st.link_button(
+        "📊 Open Data Collection File",
+        "https://docs.google.com/spreadsheets/d/1Y08jTldMTCyUvWUpgNbMb-9WJNbbD-D3/edit?gid=256704825#gid=256704825"
+    )
+
+with col2:
+    st.link_button(
+        "📝 Mark Attendance",
+        "YOUR_GOOGLE_FORM_LINK_HERE"
+    )
+
 st.caption("After completing task, report to Team Leader.")
