@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import pickle
 from datetime import datetime
-import pytz  # For timezone handling
+from zoneinfo import ZoneInfo  # ✅ modern timezone (no external dependency)
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Blue Planet", layout="wide")
@@ -57,9 +57,8 @@ if 'Date' not in df.columns or 'Intern Name' not in df.columns:
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 df = df.dropna(subset=['Date'])
 
-# Remove future dates
-india_tz = pytz.timezone("Asia/Kolkata")
-today = datetime.now(india_tz).date()
+# Remove future dates (India timezone)
+today = datetime.now(ZoneInfo("Asia/Kolkata")).date()
 df = df[df['Date'].dt.date <= today]
 
 # Sort data
@@ -119,7 +118,7 @@ else:
 
 # ---------------- FOOTER ----------------
 st.markdown("---")
-col1, col2, col3 = st.columns([1, 1, 3])  # last column is just empty space
+col1, col2, col3 = st.columns([1, 1, 3])
 
 with col1:
     st.link_button(
@@ -133,15 +132,16 @@ with col2:
         "https://docs.google.com/forms/d/e/1FAIpQLScHz7fdRGl0RbMTyh_8N5VH9G0K1LDsszsZRqwHMe9CsXcqlA/viewform"
     )
 
-col1, col2, col3= st.columns(3)
+col1, col2, col3 = st.columns(3)
+
 with col1:
     st.markdown(
-    "<p style='color:#0a58ca; font-weight:500;'>📝 After completing task, report to Team Leader.</p>",
-    unsafe_allow_html=True
-)
+        "<p style='color:#0a58ca; font-weight:500;'>📝 After completing task, report to Team Leader.</p>",
+        unsafe_allow_html=True
+    )
+
 with col2:
     st.markdown(
-    "<p style='color:#0a58ca; font-weight:500;'>📝 share your task updates in the Blue Planet Communication group for HR attendance tracking.</p>",
-    unsafe_allow_html=True
-)
-   
+        "<p style='color:#0a58ca; font-weight:500;'>📝 Share your task updates in the Blue Planet Communication group for HR attendance tracking.</p>",
+        unsafe_allow_html=True
+    )
