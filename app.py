@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import pickle
 from datetime import datetime
-import pytz
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Blue Planet Dashboard", layout="wide")
@@ -84,19 +83,17 @@ if 'Date' not in df.columns or 'Intern Name' not in df.columns:
     st.error("Missing required columns")
     st.stop()
 
-# ---------------- CLEAN + TIMEZONE FIX ----------------
-# Convert Date column
+# ---------------- CLEAN ----------------
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 df = df.dropna(subset=['Date'])
 
-# Set IST timezone
-ist = pytz.timezone('Asia/Kolkata')
-today = datetime.now(ist).date()
+# IST current date (no pytz)
+today = pd.Timestamp.now(tz="Asia/Kolkata").date()
 
-# Remove timezone from data (avoid mismatch)
+# Remove timezone if exists
 df['Date'] = df['Date'].dt.tz_localize(None)
 
-# Filter: only past + today (NO future)
+# Filter: only today + past (NO future)
 df = df[df['Date'].dt.date <= today]
 
 # Sort
@@ -112,7 +109,7 @@ with f1:
 
 intern_df = df[df['Intern Name'] == intern]
 
-# ---------------- DATE (ALWAYS TODAY DEFAULT) ----------------
+# ---------------- DATE ----------------
 default_date = today
 
 with f2:
