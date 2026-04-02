@@ -4,165 +4,179 @@ import pickle
 from datetime import datetime
 
 # ---------------- PAGE CONFIG ----------------
-st.set_page_config(page_title="Blue Planet", layout="wide")
+st.set_page_config(page_title="Blue Planet Dashboard", layout="wide")
 
-# ---------------- HIDE DEFAULT UI ----------------
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: hidden;}
-header {visibility: hidden;}
-footer {visibility: hidden;}
-[title="View code"] {visibility: hidden !important;}
-.block-container {padding: 1rem 2rem;}
-</style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
-# ---------------- CUSTOM CSS ----------------
+# ---------------- CSS ----------------
 st.markdown("""
 <style>
-body { background-color: #f4f9ff; }
-.main { background-color: #f4f9ff; }
+#MainMenu, footer, header {visibility: hidden;}
 
-h2 { color: #0a58ca; }
+.block-container {
+    padding: 1rem 2rem;
+    background-color: #eef5ff;
+}
 
-.stButton>button {
+/* HEADER */
+.topbar {
     background-color: #0a58ca;
+    padding: 14px 20px;
+    border-radius: 10px;
     color: white;
-    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
-.stDataFrame {
-    border: 2px solid #0a58ca;
-    border-radius: 10px;
+/* CARD */
+.card {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
 }
 
-/* Metric Styling */
-[data-testid="stMetric"] {
-    background-color: #ffffff;
-    border: 2px solid #0a58ca;
-    padding: 10px;
+/* KPI */
+.kpi {
+    text-align: center;
+    padding: 6px 8px;   /* 🔽 reduced from 18px */
     border-radius: 10px;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
+
+.kpi h1 {
+    color: #0a58ca;
+    margin: 0;
+    font-size: 20px;   /* 🔽 smaller number */
+}
+
+.kpi p {
+    color: gray;
+    font-size: 12px;   /* 🔽 smaller label */
+    margin: 0;
+}
+
+/* SECTION */
+.section {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 10px 0;
+    color: #0a58ca;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- TITLE ----------------
-st.markdown("## 🌍 Blue Planet Infosolutions Pvt. Ltd., India")
-st.caption("Team Leader: Tade A Rehman")
+# ---------------- HEADER ----------------
+st.markdown("""
+<div class="topbar">
+    <h2>🌍 Blue Planet Infosolutions Pvt. Ltd.</h2>
+    <p>Intern Task Dashboard</p>
+</div>
+""", unsafe_allow_html=True)
 
 # ---------------- LOAD DATA ----------------
 try:
     df = pickle.load(open("data.pkl", "rb"))
 except:
-    st.error("❌ Error loading data file")
+    st.error("Error loading file")
     st.stop()
 
-# ---------------- VALIDATION ----------------
 if 'Date' not in df.columns or 'Intern Name' not in df.columns:
-    st.error("❌ Required columns missing (Date / Intern Name)")
+    st.error("Missing required columns")
     st.stop()
 
-# ---------------- CLEAN DATA ----------------
+# ---------------- CLEAN ----------------
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 df = df.dropna(subset=['Date'])
 
 today = datetime.now().date()
-
-# Remove future dates
 df = df[df['Date'].dt.date <= today]
-
-# Sort data
 df = df.sort_values("Date")
 
-# ---------------- UI FILTER ----------------
-st.markdown("### 🔍 Filter Tasks")
+# ---------------- FILTER CARD ----------------
+st.markdown('<div class="section">🔍 Filters</div>', unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns([2, 2, 1])
+f1, f2 = st.columns([2,2])
 
-with col1:
-    intern = st.selectbox("👤 Select Intern", df['Intern Name'].unique())
+with f1:
+    intern = st.selectbox("Select Intern", df['Intern Name'].unique())
 
-# Filter intern data
 intern_df = df[df['Intern Name'] == intern]
 
-# ---------------- TASK COUNT ----------------
-tasks_till_today = intern_df[intern_df['Date'].dt.date <= today]
-task_count = len(tasks_till_today)
-
-with col3:
-    st.metric("📊 Total Tasks", task_count)
-
-# ---------------- DATE LOGIC ----------------
-dates = intern_df['Date']
-
+# Date logic
 default_date = today
-if not dates.empty:
-    available_dates = dates.dt.date.unique()
-    if today not in available_dates:
-        default_date = dates.max().date()
+if not intern_df.empty:
+    if today not in intern_df['Date'].dt.date.unique():
+        default_date = intern_df['Date'].max().date()
 
-# ---------------- SESSION STATE ----------------
-if "init_done" not in st.session_state:
-    st.session_state.selected_date = default_date
-    st.session_state.last_intern = intern
-    st.session_state.init_done = True
+with f2:
+    selected_date = st.date_input("Select Date", value=default_date)
 
-if st.session_state.last_intern != intern:
-    st.session_state.selected_date = default_date
-    st.session_state.last_intern = intern
+# ---------------- KPI SECTION ----------------
+st.markdown('<div class="section">📊 Overview</div>', unsafe_allow_html=True)
 
-with col2:
-    selected_date = st.date_input(
-        "📅 Select Date",
-        value=st.session_state.selected_date,
-        key="date_widget"
-    )
+k1, k2, k3 = st.columns(3)
 
-st.session_state.selected_date = selected_date
+task_count = len(intern_df)
+today_tasks = len(intern_df[intern_df['Date'].dt.date == today])
+active_days = intern_df['Date'].dt.date.nunique()
 
-# ---------------- RESULT ----------------
-st.markdown("---")
-st.markdown("### 📌 Task Details")
+with k1:
+    st.markdown(f"""
+    <div class="kpi">
+        <h1>{task_count}</h1>
+        <p>Total Tasks</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with k2:
+    st.markdown(f"""
+    <div class="kpi">
+        <h1>{today_tasks}</h1>
+        <p>Today's Tasks</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with k3:
+    st.markdown(f"""
+    <div class="kpi">
+        <h1>{active_days}</h1>
+        <p>Active Days</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ---------------- TABLE ----------------
+st.markdown('<div class="section">📋 Task Details</div>', unsafe_allow_html=True)
 
 result = intern_df[intern_df['Date'].dt.date == selected_date]
 
 if not result.empty:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.dataframe(result, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 else:
-    if selected_date == today:
-        st.info("ℹ️ No tasks uploaded for today yet")
-    else:
-        st.warning("⚠️ No task found for selected date")
+    st.warning("No tasks found")
 
 # ---------------- FOOTER ----------------
 st.markdown("---")
 
-col1, col2, col3 = st.columns([1, 1, 2])
+c1, c2 = st.columns(2)
 
-with col1:
+with c1:
     st.link_button(
         "📊 Open Data Sheet",
         "https://docs.google.com/spreadsheets/d/1Y08jTldMTCyUvWUpgNbMb-9WJNbbD-D3/edit?gid=256704825#gid=256704825"
     )
 
-with col2:
+with c2:
     st.link_button(
         "📝 Mark Attendance",
         "https://docs.google.com/forms/d/e/1FAIpQLScHz7fdRGl0RbMTyh_8N5VH9G0K1LDsszsZRqwHMe9CsXcqlA/viewform"
     )
 
 # ---------------- NOTES ----------------
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.markdown(
-        "<p style='color:#0a58ca; font-weight:500;'>📝 After completing task, report to Team Leader.</p>",
-        unsafe_allow_html=True
-    )
-
-with col2:
-    st.markdown(
-        "<p style='color:#0a58ca; font-weight:500;'>📝 Share your task updates in the communication group for HR tracking.</p>",
-        unsafe_allow_html=True
-    )
+st.markdown("""
+<div style='margin-top:10px; color:#0a58ca;'>
+✔ After completing tasks, report to Team Leader<br>
+✔ Share updates in communication group for HR tracking
+</div>
+""", unsafe_allow_html=True)
