@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import pickle
 from datetime import datetime
-from zoneinfo import ZoneInfo  # ✅ modern timezone (no external dependency)
+import pytz  # For timezone handling
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Blue Planet", layout="wide")
@@ -57,8 +57,11 @@ if 'Date' not in df.columns or 'Intern Name' not in df.columns:
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 df = df.dropna(subset=['Date'])
 
-# Remove future dates (India timezone)
-today = datetime.now(ZoneInfo("Asia/Kolkata")).date()
+# Timezone (India)
+india_tz = pytz.timezone("Asia/Kolkata")
+today = datetime.now(india_tz).date()
+
+# Remove future dates
 df = df[df['Date'].dt.date <= today]
 
 # Sort data
@@ -71,7 +74,15 @@ col1, col2 = st.columns(2)
 with col1:
     intern = st.selectbox("👤 Select Intern", df['Intern Name'].unique())
 
+# Filter intern data
 intern_df = df[df['Intern Name'] == intern]
+
+# ---------------- TASK COUNT (UPTO TODAY) ----------------
+tasks_till_today = intern_df[intern_df['Date'].dt.date <= today]
+task_count = len(tasks_till_today)
+
+st.markdown(f"📊 Total Assigned Tasks (Till Today): {task_count}")
+
 dates = intern_df['Date']
 
 # ---------------- SMART DEFAULT DATE ----------------
