@@ -36,7 +36,7 @@ st.markdown("""
 /* KPI */
 .kpi {
     text-align: center;
-    padding: 6px 8px;   /* 🔽 reduced from 18px */
+    padding: 6px 8px;
     border-radius: 10px;
     background: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -45,12 +45,12 @@ st.markdown("""
 .kpi h1 {
     color: #0a58ca;
     margin: 0;
-    font-size: 20px;   /* 🔽 smaller number */
+    font-size: 20px;
 }
 
 .kpi p {
     color: gray;
-    font-size: 12px;   /* 🔽 smaller label */
+    font-size: 12px;
     margin: 0;
 }
 
@@ -61,7 +61,6 @@ st.markdown("""
     margin: 10px 0;
     color: #0a58ca;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -95,18 +94,16 @@ df = df.sort_values("Date")
 # ---------------- FILTER CARD ----------------
 st.markdown('<div class="section">🔍 Filters</div>', unsafe_allow_html=True)
 
-f1, f2 = st.columns([2,2])
+f1, f2 = st.columns([2, 2])
 
 with f1:
     intern = st.selectbox("Select Intern", df['Intern Name'].unique())
 
 intern_df = df[df['Intern Name'] == intern]
 
-# Date logic
-default_date = today
-if not intern_df.empty:
-    if today not in intern_df['Date'].dt.date.unique():
-        default_date = intern_df['Date'].max().date()
+# ---------------- DATE (FIXED) ----------------
+# Always use today's real-time date
+default_date = datetime.now().date()
 
 with f2:
     selected_date = st.date_input("Select Date", value=default_date)
