@@ -12,10 +12,14 @@ st.markdown("""
 #MainMenu, footer, header {visibility: hidden;}
 
 .block-container {
-    padding: 1rem 2rem;
+    padding: 0 2rem 1rem 2rem !important;
+    margin-top: 0 !important;
     background-color: #eef5ff;
 }
 
+.block-container > div:first-child {
+    margin-top: 0 !important;
+}
 /* HEADER */
 .topbar {
     background-color: #0a58ca;
@@ -36,7 +40,7 @@ st.markdown("""
 /* KPI */
 .kpi {
     text-align: center;
-    padding: 6px 8px;
+    padding: 4px 6px;
     border-radius: 10px;
     background: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -45,13 +49,14 @@ st.markdown("""
 .kpi h1 {
     color: #0a58ca;
     margin: 0;
-    font-size: 20px;
+    font-size: 32px;   /* increased safely */
 }
 
 .kpi p {
     color: gray;
-    font-size: 12px;
+    font-size: 14px;   /* slightly bigger */
     margin: 0;
+    position:center;
 }
 
 /* SECTION */
@@ -61,6 +66,42 @@ st.markdown("""
     margin: 10px 0;
     color: #0a58ca;
 }
+/* Table border */
+.stDataFrame div[data-testid="stDataFrameContainer"] table {
+    border: 2px solid #0a58ca;
+    border-collapse: collapse;
+}
+.stDataFrame div[data-testid="stDataFrameContainer"] table td,
+.stDataFrame div[data-testid="stDataFrameContainer"] table th {
+    border: 1px solid #0a58ca;
+}
+.stDataFrame div[data-testid="stDataFrameContainer"] table th {
+    background-color: #e6f0ff;
+    color: #0a58ca;
+}
+.block-container {
+    padding: 0 2rem;
+    background-color: #eef5ff;
+}
+
+/* Topbar */
+.topbar {
+    background-color: #0a58ca;
+    padding: 14px 20px;
+    border-radius: 10px;
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* Selectbox border */
+.css-1v3fvcr input,
+.stSelectbox div[role="combobox"] input {
+    border: 2px solid #0a58ca !important;
+    border-radius: 8px;
+    padding: 6px;
+}
+            
+            
 </style>
 """, unsafe_allow_html=True)
 
@@ -87,16 +128,11 @@ if 'Date' not in df.columns or 'Intern Name' not in df.columns:
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 df = df.dropna(subset=['Date'])
 
-# IST current date (no pytz)
+# IST date (DO NOT CHANGE - as per your instruction)
 today = pd.Timestamp.now(tz="Asia/Kolkata").date()
 
-# Remove timezone if exists
 df['Date'] = df['Date'].dt.tz_localize(None)
-
-# Filter: only today + past (NO future)
 df = df[df['Date'].dt.date <= today]
-
-# Sort
 df = df.sort_values("Date")
 
 # ---------------- FILTER CARD ----------------
@@ -154,15 +190,12 @@ st.markdown('<div class="section">📋 Task Details</div>', unsafe_allow_html=Tr
 result = intern_df[intern_df['Date'].dt.date == selected_date]
 
 if not result.empty:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.dataframe(result, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 else:
     st.warning("No tasks found")
 
 # ---------------- FOOTER ----------------
-st.markdown("---")
-
 c1, c2 = st.columns(2)
 
 with c1:
@@ -180,7 +213,6 @@ with c2:
 # ---------------- NOTES ----------------
 st.markdown("""
 <div style='margin-top:10px; color:#0a58ca;'>
-✔ After completing tasks, report to Team Leader<br>
-✔ Share updates in communication group for HR tracking
+✔ After completing tasks, report to Team Leader &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp; ✔ Share updates in communication group for HR tracking
 </div>
 """, unsafe_allow_html=True)
