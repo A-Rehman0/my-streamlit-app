@@ -201,7 +201,7 @@ c1, c2 = st.columns(2)
 with c1:
     st.link_button(
         "📊 Open Data Sheet",
-        "https://docs.google.com/spreadsheets/d/1Y08jTldMTCyUvWUpgNbMb-9WJNbbD-D3/edit?gid=256704825#gid=256704825"
+        "https://docs.google.com/spreadsheets/d/1xBU0rUJXPmt1ZGupM7kt3Rmp2ViMQQ2tPRaxdD_IRGk/edit?usp=sharing"
     )
 
 with c2:
