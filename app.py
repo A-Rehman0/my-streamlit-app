@@ -146,7 +146,7 @@ with f1:
 
 
 intern_df = df[df['Intern Name'] == intern].sort_values(
-    by='Date',
+    by='df['Intern Name'].unique()',
     ascending=False
 )
 
