@@ -141,7 +141,10 @@ st.markdown('<div class="section">🔍 Filters</div>', unsafe_allow_html=True)
 f1, f2 = st.columns([2, 2])
 
 with f1:
-    intern = st.selectbox("Select Intern", df['Intern Name'].unique())
+    intern = st.selectbox(
+    "Select Intern",
+    sorted(df['Intern Name'].unique(), reverse=True)
+)
 
 
 intern_df = df[df['Intern Name'] == intern].sort_values(
