@@ -143,7 +143,11 @@ f1, f2 = st.columns([2, 2])
 with f1:
     intern = st.selectbox("Select Intern", df['Intern Name'].unique())
 
-intern_df = df[df['Intern Name'] == intern]
+
+intern_df = df[df['Intern Name'] == intern].sort_values(
+    by='df['Intern Name'].unique()',
+    ascending=False
+)
 
 # ---------------- DATE ----------------
 default_date = today
